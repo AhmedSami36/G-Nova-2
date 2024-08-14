@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -56,9 +56,9 @@ mongoose.connect(process.env.MONGO_URI_REMOTE).then(() => {
 const PORT = config.port || 3002;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-});
+});*/
 
-/*const express = require('express');
+const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -237,5 +237,3 @@ const PORT = config.port || 3002;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-*/
