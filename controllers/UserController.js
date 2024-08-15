@@ -216,6 +216,7 @@ const updateprofile=async(req,res)=>{
 
   const userId = req.ID;
   const {firstName,lastName,email,mobileNumber,bio}=req.body;
+  let profilePic = req.file ? req.file.filename : 'default.png';
     
   try {
    
@@ -235,6 +236,7 @@ const updateprofile=async(req,res)=>{
       user.email = email || user.email;
       user.mobileNumber = mobileNumber || user.mobileNumber;
       user.bio = bio || user.bio;
+      user.profilePic=profilePic || user.profilePic;
 
       await user.save();
       res.status(200).json(user);
