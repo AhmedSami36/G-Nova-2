@@ -3,6 +3,8 @@ const router = express();
 const userContoller=require('../controllers/AdminController');
 const adminEstateController = require('../controllers/estateController');
 const compoundController = require('../controllers/compoundController');
+const workerController = require('../controllers/workerController');
+
 const middleware=require('../middleware/authMiddleware');
 
 //admin account
@@ -59,16 +61,34 @@ Postman json:
 
 */
 // Get all compounds
-router.get('/getAllCompounds',compoundController.getAllCompounds);
+router.get('/getAllCompounds',middleware,compoundController.getAllCompounds);
 // Get a single compound by ID
-router.get('/getCompoundById/:id',compoundController.getCompoundById);
+router.get('/getCompoundById/:id',middleware,compoundController.getCompoundById);
 // Create a new compound
-router.post('/createCompound',compoundController.uploadphoto,compoundController.resizePhoto,compoundController.createCompound);
+router.post('/createCompound',middleware,compoundController.uploadphoto,compoundController.resizePhoto,compoundController.createCompound);
 // Update a compound by ID
-router.put('/updateCompound/:id', compoundController.updateCompound);
+router.put('/updateCompound/:id', middleware,compoundController.updateCompound);
 // Delete a compound by ID
-router.delete('/deleteCompound/:id', compoundController.deleteCompound);
+router.delete('/deleteCompound/:id',middleware, compoundController.deleteCompound);
 
+
+//worker routes 
+// Route to add a new worker
+router.post('/addworker', middleware,workerController.addWorker);
+
+// Route to update an existing worker
+router.put('/updateworker/:id',middleware, workerController.updateWorker);
+
+// Route to delete a worker
+router.delete('/deleteworker/:id', middleware,workerController.deleteWorker);
+// Get all workers
+router.get('/getallworkers',middleware, workerController.getAllWorkers);
+
+// Get worker by ID
+router.get('/getworkerbyid/:id',middleware, workerController.getWorkerById);
+
+// Get worker by name
+router.get('/getworkerbyname/:name', middleware,workerController.getWorkerByName);
 module.exports = router;
 
 
