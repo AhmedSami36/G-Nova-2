@@ -59,11 +59,11 @@ Postman json:
 
 */
 // Get all compounds
-router.get('/getAllCompounds', compoundController.getAllCompounds);
+router.get('/getAllCompounds',compoundController.getAllCompounds);
 // Get a single compound by ID
-router.get('/getCompoundById/:id', compoundController.getCompoundById);
+router.get('/getCompoundById/:id',compoundController.getCompoundById);
 // Create a new compound
-router.post('/createCompound', compoundController.createCompound);
+router.post('/createCompound',compoundController.uploadphoto,compoundController.resizePhoto,compoundController.createCompound);
 // Update a compound by ID
 router.put('/updateCompound/:id', compoundController.updateCompound);
 // Delete a compound by ID
