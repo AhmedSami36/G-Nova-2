@@ -11,7 +11,7 @@ router.post('/login',userContoller.signin);
 router.get('/getinfo',middleware,userContoller.getuserinfo);
 router.post('/forgetpassword',userContoller.forgotPassword);
 router.post('/resetpassword',userContoller.resetPassword);
-router.put('/editprofile',middleware,userContoller.updateprofile);
+router.put('/editprofile',userContoller.uploadphoto,userContoller.resizePhoto,middleware,userContoller.updateprofile);
   
 router.get('/getallestates',middleware, userestateController.getAllEstates);
 router.get('/getestatebyid/:id', middleware,userestateController.getEstateById);
