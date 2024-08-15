@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Application</title>
+  <style>
+    #chat-box {
+      width: 300px;
+      height: 400px;
+      border: 1px solid #ccc;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+    }
+    .message {
+      margin: 5px;
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    #message-input {
+      width: 240px;
+    }
+    #send-button {
+      width: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-box"></div>
+
+  <input id="message-input" type="text" placeholder="Enter your message" />
+  <button id="send-button">Send</button>
+
+  <script>
+    // Replace with the WebSocket server URL (wsServer1)
+    const socket = new WebSocket('ws://localhost:8083');
+
+    // On connection established
+    socket.onopen = function(event) {
+      console.log('Connected to WebSocket server');
+    };
+
+    // On receiving message from the server
+    socket.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      displayMessage(data.senderId, data.content);
+    };
+
+    // On connection closed
+    socket.onclose = function(event) {
+      console.log('Disconnected from WebSocket server');
+    };
+
+    // On error
+    socket.onerror = function(error) {
+      console.error('WebSocket Error:', error);
+    };
+
+    // Send message to WebSocket server
+    document.getElementById('send-button').addEventListener('click', function() {
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value;
+      const senderId = '60f5a3b71c4e4f0015f47a23';  // Replace with actual sender ID
+      const receiverId = '60f5a3b71c4e4f0015f47a24'; // Replace with actual receiver ID
+      const role = 'user';  // Adjust as needed
+
+      const data = JSON.stringify({
+        senderId,
+        receiverId,
+        content: message,
+        role
+      });
+
+      socket.send(data);
+      displayMessage(senderId, message);  // Display the message on the UI
+      messageInput.value = '';  // Clear input field
+    });
+
+    // Display message in chat-box
+    function displayMessage(senderId, message) {
+      const chatBox = document.getElementById('chat-box');
+      const messageElement = document.createElement('div');
+      messageElement.className = 'message';
+      messageElement.innerHTML = `<strong>${senderId}:</strong> ${message}`;
+      chatBox.appendChild(messageElement);
+      chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom
+    }
+  </script>
+</body>
+</html>
