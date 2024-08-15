@@ -4,12 +4,48 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/UserModel'); 
 const crypto = require('crypto');
 const { sendemail } = require('../utils/email');
-
+const multer = require('multer');
+const sharp = require('sharp');
 require('dotenv').config();
 const saltRounds=10;
 
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    }
+    else {
+        cb("Not an image! please upload only images.", false)
+    }
+}
+
+
+const upload = multer({
+
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
+
+const uploadphoto = upload.single('Image');
+
+const resizePhoto = (req, res, next) => {
+
+    if (!req.file) return next();
+
+    req.file.filename = `User-${req.ID}-${Date.now()}.jpeg`;
+
+    sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/users/${req.file.filename}`);
+    next();
+}
+
+
+
 const signup = async (req, res) => {
+
     const { username, email,lastName,firstName, password, phoneNum } = req.body;
+    let profilePic = req.file ? req.file.filename : 'default.png';
 
     try {
         // Check if user with the same email already exists
@@ -31,7 +67,7 @@ const signup = async (req, res) => {
        
 
         // Create a new user
-        user = new User({ username, email,firstName,lastName, password:hashedPassword, phoneNum });
+        user = new User({ username, email,firstName,lastName, password:hashedPassword, phoneNum,profilePic });
 
         
 
@@ -308,6 +344,8 @@ const viewBio = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+
 const addToFavourites = async (req, res) => {
   try {
     const userId = req.ID; // Use req.ID from the middleware
@@ -421,5 +459,8 @@ module.exports = {
     updateBio,
     getAllChatsForUser,
     getChatHistoryForUser,
-    searchUserByUsername
+    searchUserByUsername,
+    uploadphoto,
+    resizePhoto
+
 };

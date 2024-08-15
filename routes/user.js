@@ -6,7 +6,7 @@ const userestateController = require('../controllers/estateController');
 const middleware=require('../middleware/authMiddleware');
 const compoundController=require("../controllers/compoundController")
 
-router.post('/register',userContoller.signup);
+router.post('/register',userContoller.uploadphoto,userContoller.resizePhoto,userContoller.signup);
 router.post('/login',userContoller.signin);
 router.get('/getinfo',middleware,userContoller.getuserinfo);
 router.post('/forgetpassword',userContoller.forgotPassword);
