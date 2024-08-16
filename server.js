@@ -150,7 +150,7 @@ app.use(errorMiddleware);
 // Routes
 app.use('/users', userRoutes);
 app.use('/admin', adminRoutes);
-
+/*
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI_REMOTE, {
     useNewUrlParser: true,
@@ -160,7 +160,18 @@ mongoose.connect(process.env.MONGO_URI_REMOTE, {
 }).catch(err => {
     console.log('MongoDB connection failed:', err);
     process.exit(1);
-});
+});*/
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI_REMOTE)
+    .then(() => {
+        console.log('MongoDB connection successfully');
+    })
+    .catch(err => {
+        console.log('MongoDB connection failed:', err);
+        process.exit(1);
+    });
+
 
 // Start the server
 const PORT = config.port || 3002;
