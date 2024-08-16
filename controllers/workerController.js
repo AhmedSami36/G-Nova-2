@@ -3,8 +3,6 @@ const bcrypt = require('bcrypt');
 const Worker = require('../models/WorkerModel');
 
 const addWorker = async (req, res) => {
-    console.log('Request Body:', req.body); // Add this line to check the request body
-
     const { firstName, lastName, email, profilePic, mobileNumber, bio } = req.body;
 
     try {
