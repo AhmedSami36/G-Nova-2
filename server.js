@@ -17,7 +17,7 @@ const Message = require('./models/MessageModel');
 const Chat = require('./models/ChatModel');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
-
+const Notification = require('./models/NotificationModel'); 
 // Load environment variables from .env file
 dotenv.config();
 
@@ -71,6 +71,14 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
       // Add the saved message to the chat's messages array
       chat.messages.push(newMessage._id);
       await chat.save();
+
+
+      await Notification.create({
+        user: receiverId,
+        chat: chat._id,
+        message: `New message from ${senderId}: ${content}`,
+        type: 'new_message'
+      });
 
       // Broadcast the message to other connected clients
       broadcastMessage(serverName, {

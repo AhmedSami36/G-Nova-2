@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express();
 const userContoller=require('../controllers/UserController')
-
+const notificationController=require('../controllers/NotificationController');
 const userestateController = require('../controllers/estateController');
 const middleware=require('../middleware/authMiddleware');
 const compoundController=require("../controllers/compoundController")
+
 
 router.post('/register',userContoller.uploadphoto,userContoller.resizePhoto,userContoller.signup);
 router.post('/login',userContoller.signin);
@@ -46,5 +47,14 @@ router.get('/searchUserByUsername/:username',middleware,userContoller.getAllChat
 router.get('/getAllCompounds', compoundController.getAllCompounds);
 // Get a single compound by ID
 router.get('/getCompoundById/:id', compoundController.getCompoundById);
+
+
+
+router.get('/getNotifications', middleware, notificationController.getNotifications);
+
+
+router.patch('/markAsRead/:id/read', middleware, notificationController.markAsRead);
+
+
 
 module.exports = router;
