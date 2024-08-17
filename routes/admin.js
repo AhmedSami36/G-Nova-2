@@ -16,8 +16,8 @@ router.post('/resetpassword',userContoller.resetPassword);
 //manage estates
 router.get('/getallestates',middleware, adminEstateController.getAllEstates);
 router.get('/getestatebyid/:id', middleware,adminEstateController.getEstateById);
-router.post('/createestate', middleware,adminEstateController.createEstate);
-router.put('/updateestate/ :id',middleware, adminEstateController.updateEstate);
+router.post('/createestate', middleware,adminEstateController.uploadphoto,adminEstateController.resizePhoto,adminEstateController.createEstate);
+router.put('/updateestate/ :id',middleware,adminEstateController.uploadphoto,adminEstateController.resizePhoto, adminEstateController.updateEstate);
 router.delete('/deleteestate/ :id',middleware, adminEstateController.deleteEstate);
 router.get('/getestatebyname/:name',middleware, adminEstateController.getEstateByName);
 router.get('/getestatesbycategory/:category',middleware, adminEstateController.getEstatesByCategory);
@@ -74,10 +74,10 @@ router.delete('/deleteCompound/:id',middleware, compoundController.deleteCompoun
 
 //worker routes 
 // Route to add a new worker
-router.post('/addworker', middleware,workerController.addWorker);
+router.post('/addworker', middleware,workerController.uploadphoto,workerController.resizePhoto,workerController.addWorker);
 
 // Route to update an existing worker
-router.put('/updateworker/:id',middleware, workerController.updateWorker);
+router.put('/updateworker/:id',middleware,workerController.uploadphoto,workerController.uploadphoto, workerController.updateWorker);
 
 // Route to delete a worker
 router.delete('/deleteworker/:id', middleware,workerController.deleteWorker);

@@ -1,9 +1,51 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const Worker = require('../models/WorkerModel');
+const multer = require('multer');
+const sharp = require('sharp');
+
+
+
+
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    }
+    else {
+        cb("Not an image! please upload only images.", false)
+    }
+}
+
+
+const upload = multer({
+
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
+
+const uploadphoto = upload.single('Image');
+
+const resizePhoto = (req, res, next) => {
+
+    if (!req.file) return next();
+
+    req.file.filename = `Worker-${req.ID}-${Date.now()}.jpeg`;
+
+    sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/workers/${req.file.filename}`);
+    next();
+}
+
+
+
+
 
 const addWorker = async (req, res) => {
-    const { firstName, lastName, email, profilePic, mobileNumber, bio } = req.body;
+ 
+    const { firstName, lastName, email, mobileNumber, bio } = req.body;
+    let profilePic = req.file ? req.file.filename : 'default.png';
 
     try {
         const existingWorker = await Worker.findOne({ email });
@@ -31,7 +73,8 @@ const addWorker = async (req, res) => {
 // Update an existing worker
 const updateWorker = async (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, profilePic, mobileNumber, bio } = req.body;
+    const { firstName, lastName, mobileNumber, bio } = req.body;
+    let profilePic = req.file ? req.file.filename : 'default.png';
 
     try {
         const worker = await Worker.findById(id);
@@ -142,5 +185,7 @@ module.exports = {
     getWorkerByName,
     addWorker,
     updateWorker,
-    deleteWorker
+    deleteWorker,
+    uploadphoto,
+    resizePhoto
 };

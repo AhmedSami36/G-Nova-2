@@ -163,6 +163,9 @@ exports.createEstate = async (req, res) => {
             });
         }
 
+
+        req.body.photos = req.file ? [req.file.filename] : ['default.png'];
+
         // Create a new state
         const newEstate = await Estate.create(req.body);
         res.status(201).json({
@@ -178,9 +181,15 @@ exports.createEstate = async (req, res) => {
     }
 };
 
-// Update a state
+// Update an estate
 exports.updateEstate = async (req, res) => {
     try {
+        // If there's a new photo, handle the update for photos
+        if (req.file) {
+            req.body.photos = req.file ? [req.file.filename] : ['default.png'];
+        }
+
+        // Update the estate with new data (including photo if applicable)
         const updatedEstate = await Estate.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
@@ -189,14 +198,14 @@ exports.updateEstate = async (req, res) => {
         if (!updatedEstate) {
             return res.status(404).json({
                 status: 'fail',
-                message: 'State not found'
+                message: 'Estate not found'
             });
         }
 
         res.status(200).json({
             status: 'success',
             data: updatedEstate,
-            message: 'State updated successfully'
+            message: 'Estate updated successfully'
         });
     } catch (err) {
         res.status(500).json({
@@ -205,6 +214,7 @@ exports.updateEstate = async (req, res) => {
         });
     }
 };
+
 
 // Delete a state
 exports.deleteEstate = async (req, res) => {
