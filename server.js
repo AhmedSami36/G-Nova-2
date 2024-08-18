@@ -17,6 +17,7 @@ const Chat = require('./models/ChatModel');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const Notification = require('./models/NotificationModel'); 
+const developerRoutes = require('./routes/developerRoutes');
 // Load environment variables from .env file
 dotenv.config();
 
@@ -185,6 +186,7 @@ app.use(errorMiddleware);
 // Routes
 app.use('/users', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/dev', developerRoutes);
 /*
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI_REMOTE, {
