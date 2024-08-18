@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const session = require('express-session');
 const helmet = require('helmet');
-const authMiddleware = require('./middleware/authMiddleware');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const extractToken = require('./middleware/extractToken');
 const config = require('./config/config');
