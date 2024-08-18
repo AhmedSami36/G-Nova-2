@@ -9,6 +9,10 @@ const workerSchema = new mongoose.Schema({
   profilePic: { type: String, default: '' },
   mobileNumber: { type: String, default: '' },
   bio: { type: String, default: '' },
+  workAt: {
+    type: String,
+    required: true,
+  }
   });
 
 
