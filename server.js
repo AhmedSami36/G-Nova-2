@@ -106,18 +106,26 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
   });
 };
 
-const broadcastNotificationToUser = (receiverId, notificationData) => {
-  const targetServer = receiverId % 2 === 0 ? wsServer1 : wsServer2; // Example logic for choosing server
-  
-  targetServer.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
+const broadcastNotificationToUser = (userId, notification) => {
+  wsServer1.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN && client.userId === userId) {
       client.send(JSON.stringify({
-        type: 'notification',
-        ...notificationData
+        type: 'new_notification',
+        notification
+      }));
+    }
+  });
+
+  wsServer2.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN && client.userId === userId) {
+      client.send(JSON.stringify({
+        type: 'new_notification',
+        notification
       }));
     }
   });
 };
+
 // Function to broadcast messages to connected clients
 const broadcastMessage = (serverName, data) => {
   const { senderId, receiverId, content, role, timestamp } = data;
