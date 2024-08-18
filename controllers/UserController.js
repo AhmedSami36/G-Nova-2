@@ -117,27 +117,25 @@ const signin = async (req, res) => {
 
 // Get current user
 const getuserinfo = async (req, res) => {
-    const userId = req.ID;
-    
-    try {
-     
-        
-        if (!userId) {
-            return res.status(401).json({ message: 'No token, authorization denied' });
-        }
+  const userId = req.ID;
+  try {
+      if (!userId) {
+          return res.status(401).json({ message: 'No token, authorization denied' });
+      }
 
-        // Find the user by ID and exclude the password field
-        const user = await User.findById(userId).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+      // Find the user by ID and exclude the password field
+      const user = await User.findById(userId).select('-password');
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
 
-        res.status(200).json(user);
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Server error');
-    }
+      res.status(200).json(user);
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server error');
+  }
 };
+
 
 
 const generateOTP = () => {
