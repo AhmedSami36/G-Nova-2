@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config(); // Load environment variables
 
 const sendemail = async (options) => {
-    // 1. Create transporter
+
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
@@ -16,7 +16,7 @@ const sendemail = async (options) => {
         }
     });
 
-    // 2. Define the email options 
+   
     const mailOptions = {
         from: "G-Nova Teams <hello@Teams.io>",
         to: options.email,
@@ -24,7 +24,7 @@ const sendemail = async (options) => {
         text: options.message
     };
 
-    // 3. Send the email
+   
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
