@@ -53,6 +53,7 @@ exports.getAllEstates = async (req, res) => {
 // Get all estates by category
 exports.getEstatesByCategory = async (req, res) => {
     try {
+        
         const category = req.params.category;
         const estates = await Estate.find({ category });
 
@@ -127,21 +128,21 @@ exports.getEstateById = async (req, res) => {
 // Get an estate by name
 exports.getEstateByName = async (req, res) => {
     try {
-        // Find the estate by title (case-insensitive search)
-        const estate = await Estate.findOne({ title: new RegExp('^' + req.params.name + '$', 'i') });
+        const estate = await Estate.find({
+            title: new RegExp(req.params.name, 'i')  
+        });
 
-
-        if (!estate) {
+        if (estate.length === 0) {
             return res.status(404).json({
                 status: 'fail',
-                message: 'Estate not found'
+                message: 'No estates found'
             });
         }
 
         res.status(200).json({
             status: 'success',
             data: estate,
-            message: 'Estate retrieved successfully'
+            message: 'Estates retrieved successfully'
         });
     } catch (err) {
         res.status(500).json({
@@ -151,8 +152,10 @@ exports.getEstateByName = async (req, res) => {
     }
 };
 
+
 // Create a new state
 exports.createEstate = async (req, res) => {
+    
     try {
         // Check if a state with the same title and location already exists
         const existingEstate = await Estate.findOne({ title: req.body.title, location: req.body.location });

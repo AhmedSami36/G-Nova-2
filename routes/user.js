@@ -12,22 +12,22 @@ router.post('/login',userContoller.signin);
 router.get('/getinfo',middleware,userContoller.getuserinfo);
 router.post('/forgetpassword',userContoller.forgotPassword);
 router.post('/resetpassword',userContoller.resetPassword);
-router.put('/editprofile',userContoller.uploadphoto,userContoller.resizePhoto,middleware,userContoller.updateprofile);
+router.put('/editprofile',middleware,userContoller.uploadphoto,userContoller.resizePhoto,userContoller.updateprofile);
   
 router.get('/getallestates',middleware, userestateController.getAllEstates);
 router.get('/getestatebyid/:id', middleware,userestateController.getEstateById);
-router.post('/createestate', middleware,userestateController.createEstate);
-router.put('/updateestate/ :id',middleware, userestateController.updateEstate);
-router.delete('/deleteestate/ :id',middleware, userestateController.deleteEstate);
+
 router.get('/getestatebyname/:name',middleware, userestateController.getEstateByName);
 router.get('/getestatesbycategory/:category',middleware, userestateController.getEstatesByCategory);
-router.get('/estates/city/:city', middleware,userestateController.getEstatesByCity);
+router.get('/getEstatesByCity/:city', middleware,userestateController.getEstatesByCity);
+
+
 //view offers
-router.get('/estates/offers', middleware,userestateController.getAllEstatesWithOffers);
+router.get('/getAllEstatesWithOffers', middleware,userestateController.getAllEstatesWithOffers);
 //newlaunched
-router.get('/estates/newly-launched',middleware, userestateController.getNewlyLaunchedEstates);
+router.get('/getNewlyLaunchedEstates',middleware, userestateController.getNewlyLaunchedEstates);
 // Bio routes
-//router.put('/addtobio', middleware, userContoller.updateBio); // No need for :id
+router.put('/updateBio', middleware, userContoller.updateBio); // No need for :id
 router.get('/viewbio', middleware, userContoller.viewBio); // No need for :id
 
 // Favorite routes

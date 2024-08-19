@@ -45,7 +45,7 @@ const compoundSchema = new mongoose.Schema({
     workers: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Workers',
+        ref: 'Worker',
         required: false
       }
     ],

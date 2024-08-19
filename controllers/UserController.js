@@ -28,7 +28,7 @@ const upload = multer({
     fileFilter: multerFilter
 });
 
-const uploadphoto = upload.single('Image');
+const uploadphoto = upload.single('profilePic');
 
 const resizePhoto = (req, res, next) => {
 
@@ -95,6 +95,7 @@ const signin = async (req, res) => {
 
     // Check if user exists
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -348,7 +349,7 @@ const viewBio = async (req, res) => {
 
 const addToFavourites = async (req, res) => {
   try {
-    const userId = req.ID; // Use req.ID from the middleware
+    const userId = req.ID; 
     const estateId = req.body.estateId;
 
     // Validate estateId
