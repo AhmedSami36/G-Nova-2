@@ -20,17 +20,34 @@ const upload = multer({
     fileFilter: multerFilter
 });
 
-exports.uploadphoto = upload.single('Image');
+exports.uploadphoto= upload.array('photos', 5);
 
-exports.resizePhoto = (req, res, next) => {
+exports.resizePhoto = async (req, res, next) => {
+    if (!req.files || req.files.length === 0) return next();
 
-    if (!req.file) return next();
+    // Array to store the filenames of resized images
+    req.body.photos = [];
 
-    req.file.filename = `estate-${req.ID}-${Date.now()}.jpeg`;
+    // Loop over the uploaded files and process each one
+    await Promise.all(
+        req.files.map(async (file, i) => {
+            const filename = `estate-${req.ID}-${Date.now()}-${i + 1}.jpeg`;
 
-    sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/estates/${req.file.filename}`);
+            // Resize the image and save it
+            await sharp(file.buffer)
+                .resize(500, 500)
+                .toFormat('jpeg')
+                .jpeg({ quality: 90 })
+                .toFile(`public/img/estates/${filename}`);
+
+            // Push the filename to req.body.photos array
+            req.body.photos.push(filename);
+        })
+    );
+
     next();
-}
+};
+
 
 
 
@@ -166,8 +183,11 @@ exports.createEstate = async (req, res) => {
             });
         }
 
+        const photos = req.body.photos && req.body.photos.length > 0 
+        ? req.body.photos 
+        : ['default.png']; // Set default if no photos uploaded
 
-        req.body.photos = req.file ? [req.file.filename] : ['default.png'];
+        req.body.photos = photos; // Assign photos to the body
 
         // Create a new state
         const newEstate = await Estate.create(req.body);
@@ -187,10 +207,13 @@ exports.createEstate = async (req, res) => {
 // Update an estate
 exports.updateEstate = async (req, res) => {
     try {
-        // If there's a new photo, handle the update for photos
-        if (req.file) {
-            req.body.photos = req.file ? [req.file.filename] : ['default.png'];
+        if (req.files && req.files.length > 0) {
+           
+            req.body.photos = req.body.photos && req.body.photos.length > 0 
+                ? req.body.photos 
+                : ['default.png']; 
         }
+
 
         // Update the estate with new data (including photo if applicable)
         const updatedEstate = await Estate.findByIdAndUpdate(req.params.id, req.body, {

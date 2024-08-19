@@ -26,7 +26,7 @@ const upload = multer({
     fileFilter: multerFilter
 });
 
-const uploadphoto = upload.single('Image');
+const uploadphoto = upload.single('profilePic');
 
 const resizePhoto = (req, res, next) => {
 
@@ -43,8 +43,7 @@ const resizePhoto = (req, res, next) => {
 
 
 const addWorker = async (req, res) => {
- 
-    const { firstName, lastName, email, mobileNumber, bio } = req.body;
+    const { firstName, lastName, email, mobileNumber, bio, workAt } = req.body;
     let profilePic = req.file ? req.file.filename : 'default.png';
 
     try {
@@ -59,7 +58,8 @@ const addWorker = async (req, res) => {
             email,
             profilePic,
             mobileNumber,
-            bio
+            bio,
+            workAt  // Include workAt here
         });
 
         await worker.save();

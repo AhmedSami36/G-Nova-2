@@ -11,7 +11,7 @@ const workerSchema = new mongoose.Schema({
   bio: { type: String, default: '' },
   workAt: {
     type: String,
-    required: true,
+    default: '' 
   }
   });
 

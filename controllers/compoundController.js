@@ -20,17 +20,31 @@ const upload = multer({
     fileFilter: multerFilter
 });
 
-exports.uploadphoto = upload.single('Image');
+exports.uploadphoto = upload.array('compoundImages', 5);
 
-exports.resizePhoto = (req, res, next) => {
+exports.resizePhoto = async (req, res, next) => {
+    if (!req.files || req.files.length === 0) return next();
 
-    if (!req.file) return next();
+    req.body.compoundImages = [];
 
-    req.file.filename = `compound-${req.ID}-${Date.now()}.jpeg`;
+    await Promise.all(
+        req.files.map(async (file, i) => {
+            const filename = `compound-${Date.now()}-${i + 1}.jpeg`;
 
-    sharp(req.file.buffer).resize(500, 500).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/img/compounds/${req.file.filename}`);
+            await sharp(file.buffer)
+                .resize(500, 500)
+                .toFormat('jpeg')
+                .jpeg({ quality: 90 })
+                .toFile(`public/img/compounds/${filename}`);
+
+            req.body.compoundImages.push(filename);
+        })
+    );
+
     next();
-}
+};
+
+
 
 // Get all compounds
 exports.getAllCompounds = async (req, res) => {
@@ -57,25 +71,47 @@ exports.getCompoundById = async (req, res) => {
 
 // Create a new compound
 exports.createCompound = async (req, res) => {
-  const compound = new Compound({
-    name: req.body.name,
-    estates: req.body.estates,
-    compoundImages: req.file ? req.file.filename : 'default.png',
-    address: req.body.address,
-    city: req.body.city,
-    state: req.body.state,
-    description: req.body.description,
-    contactInfo: req.body.contactInfo,
-    workers: req.body.workers
-  });
-
   try {
-    const newCompound = await compound.save();
-    res.status(201).json(newCompound);
+      // Check if a compound with the same name and address already exists
+      const existingCompound = await Compound.findOne({
+          name: req.body.name,
+          address: req.body.address,
+          city: req.body.city,
+          state: req.body.state
+      });
+
+      if (existingCompound) {
+          return res.status(400).json({
+              status: 'fail',
+              message: 'Compound with this title and location already exists'
+          });
+      }
+
+      // Use the processed images or default to 'default.png'
+      const compoundImages = req.body.compoundImages.length > 0 
+          ? req.body.compoundImages 
+          : ['default.png'];
+
+      // Create new compound
+      const newCompound = await Compound.create({
+          ...req.body,
+          compoundImages: compoundImages
+      });
+
+      res.status(201).json({
+          status: 'success',
+          data: newCompound,
+          message: 'Compound created successfully'
+      });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+      res.status(400).json({
+          status: 'fail',
+          message: err.message
+      });
   }
 };
+
+
 
 // Update a compound by ID
 exports.updateCompound = async (req, res) => {
@@ -96,14 +132,16 @@ exports.updateCompound = async (req, res) => {
 // Delete a compound by ID
 exports.deleteCompound = async (req, res) => {
   try {
-    const compound = await Compound.findById(req.params.id);
+    // Find and delete the compound by ID
+    const compound = await Compound.findByIdAndDelete(req.params.id);
+
     if (!compound) {
       return res.status(404).json({ message: 'Compound not found' });
     }
 
-    await compound.remove();
     res.status(200).json({ message: 'Compound deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+

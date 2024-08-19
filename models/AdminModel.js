@@ -18,7 +18,9 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    }
+    },
+    resetPasswordOTP: { type: String, default: '' },
+    resetPasswordExpires: { type: Date, default: null },
 });
 
 // Method to generate a JWT token
