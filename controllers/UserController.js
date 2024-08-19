@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/UserModel'); 
+const Chat=require('../models/ChatModel');
 const crypto = require('crypto');
 const { sendemail } = require('../utils/email');
 const multer = require('multer');
@@ -248,31 +249,38 @@ const updateprofile=async(req,res)=>{
 };
 
 
-const  getAllChatsForUser=async (req,res) =>{
-
+const getAllChatsForUser = async (req, res) => {
   const userId = req.ID;
+  
   try {
+    // Fetch the user and populate the chats field, including participants and their selected details
     const userWithChats = await User.findById(userId)
       .populate({
         path: 'chats',
-        select: '_id participants',  // Select only the chat ID and participants
         populate: {
-          path: 'participants',
-          select: 'username firstName lastName profilePic' // Select user details to display in chat list
+          path: 'participants', // Populate participants inside chats
+          select: 'username firstName lastName profilePic' // Select participant details
         }
       })
-      .select('chats'); // Select only the chats field from the user document
+      .select('chats'); // Select only the 'chats' field from the user document
+
+      
 
     if (!userWithChats) {
-      throw new Error('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // If no chats exist, return an empty array
+    if (!userWithChats.chats || userWithChats.chats.length === 0) {
+      return res.status(200).json([]);
     }
 
     res.status(200).json(userWithChats.chats);
   } catch (error) {
     console.error(error.message);
-    throw new Error('Error fetching chats for user');
+    res.status(500).json({ message: 'Error fetching chats for user' });
   }
-}
+};
 
 const getChatHistoryForUser = async (req, res) => {
   const userId = req.ID; 
@@ -436,7 +444,10 @@ const searchUserByUsername = async (req, res) => {
 
   try {
 
-      const user = await User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } }).select('-password');
+    const user = await User.find({
+      username: { $regex: username, $options: 'i' } // 'i' option makes it case-insensitive
+    }).select('-password'); 
+
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
       }

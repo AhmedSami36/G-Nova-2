@@ -18,6 +18,8 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const Notification = require('./models/NotificationModel'); 
 const developerRoutes = require('./routes/developerRoutes');
+const User = require('./models/UserModel');       // Import the User model
+ 
 // Load environment variables from .env file
 dotenv.config();
 
@@ -49,7 +51,7 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
       const newMessage = new Message({
         sender: senderId,
         content,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
       // Save the message to the database
@@ -57,14 +59,14 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
 
       // Find or create a chat between the two users (sender and receiver)
       let chat = await Chat.findOne({
-        participants: { $all: [senderId, receiverId] }
+        participants: { $all: [senderId, receiverId] },
       });
 
       // If no chat exists, create a new one
       if (!chat) {
         chat = new Chat({
           participants: [senderId, receiverId],
-          messages: []
+          messages: [],
         });
       }
 
@@ -72,21 +74,26 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
       chat.messages.push(newMessage._id);
       await chat.save();
 
+      // Ensure the chat is added to both the sender's and receiver's chats array
+      await User.updateMany(
+        { _id: { $in: [senderId, receiverId] } },
+        { $addToSet: { chats: chat._id } } // Ensures chat is added only once
+      );
 
-      await Notification.create({
+      // Create and broadcast notification
+      const notification = await Notification.create({
         user: receiverId,
         chat: chat._id,
         message: `New message from ${senderId}: ${content}`,
-        type: 'new_message'
+        type: 'new_message',
       });
 
-         // Notify the receiver via WebSocket
-         broadcastNotificationToUser(receiverId, {
-          notificationId: Notification._id,
-          message: Notification.message,
-          type: Notification.type,
-          timestamp: Notification.createdAt
-        });
+      broadcastNotificationToUser(receiverId, {
+        notificationId: notification._id,
+        message: notification.message,
+        type: notification.type,
+        timestamp: notification.createdAt,
+      });
 
       // Broadcast the message to other connected clients
       broadcastMessage(serverName, {
@@ -94,7 +101,7 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
         receiverId,
         content,
         role,
-        timestamp: newMessage.timestamp
+        timestamp: newMessage.timestamp,
       });
     } catch (error) {
       console.error('Error saving chat message to MongoDB:', error);
@@ -105,6 +112,7 @@ const handleChatWebSocketConnection = async (ws, serverName) => {
     console.log(`Client disconnected from ${serverName}`);
   });
 };
+
 
 const broadcastNotificationToUser = (userId, notification) => {
   wsServer1.clients.forEach(client => {

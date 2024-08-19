@@ -40,7 +40,7 @@ router.get('/viewfavorites', middleware, userContoller.viewFavourites); // No ne
 
 router.get('/getAllChatsForUser',middleware,userContoller.getAllChatsForUser);
 router.get('/getChatHistoryForUser/:chatId',middleware,userContoller.getChatHistoryForUser);
-router.get('/searchUserByUsername/:username',middleware,userContoller.getAllChatsForUser);
+router.get('/searchUserByUsername/:username',middleware,userContoller.searchUserByUsername);
 
 // compound routes
 // Get all compounds
