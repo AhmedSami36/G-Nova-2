@@ -457,6 +457,39 @@ const searchUserByUsername = async (req, res) => {
   }
 };
 
+
+const updateLocation = async (req, res) => {
+  const userId = req.ID;
+  const { latitude, longitude } = req.body;
+
+  if (!latitude || !longitude) {
+    return res.status(400).json({ message: 'Latitude and longitude are required' });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        location: {
+          type: 'Point',
+          coordinates: [longitude, latitude]
+        }
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Location updated successfully', location: user.location });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
 module.exports = {
     signup,
     signin,
@@ -473,6 +506,7 @@ module.exports = {
     getChatHistoryForUser,
     searchUserByUsername,
     uploadphoto,
-    resizePhoto
+    resizePhoto,
+    updateLocation
 
 };

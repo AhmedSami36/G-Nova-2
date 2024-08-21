@@ -13,6 +13,7 @@ router.get('/getinfo',middleware,userContoller.getuserinfo);
 router.post('/forgetpassword',userContoller.forgotPassword);
 router.post('/resetpassword',userContoller.resetPassword);
 router.put('/editprofile',middleware,userContoller.uploadphoto,userContoller.resizePhoto,userContoller.updateprofile);
+router.put('/updateLocation',middleware,userContoller.updateLocation);
   
 router.get('/getallestates',middleware, userestateController.getAllEstates);
 router.get('/getestatebyid/:id', middleware,userestateController.getEstateById);
